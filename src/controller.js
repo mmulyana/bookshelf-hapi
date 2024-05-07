@@ -37,4 +37,19 @@ function createBookHandler(req, h) {
   }
 }
 
-module.exports = { createBookHandler }
+function getBookHandler(req, h) {
+  const books = bookServices.findMany()
+
+  const response = h.response({
+    status: 'success',
+    data: {
+      books,
+    },
+  })
+
+  response.code(200)
+
+  return response
+}
+
+module.exports = { createBookHandler, getBookHandler }
