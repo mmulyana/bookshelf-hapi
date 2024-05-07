@@ -126,9 +126,44 @@ function updateBookHandler(req, h) {
   }
 }
 
+function deleteBookHandler(req, h) {
+  const { bookId } = req.params
+  try {
+    if (!checkBookByID(bookId)) {
+      throw new Error('Buku gagal dihapus. Id tidak ditemukan')
+    }
+
+    bookServices.deleteById(bookId)
+
+    return h
+      .response({
+        status: 'success',
+        message: 'Buku berhasil dihapus',
+      })
+      .code(200)
+  } catch (error) {
+    if (error.message == 'Buku gagal dihapus. Id tidak ditemukan') {
+      return h
+        .response({
+          status: 'fail',
+          message: error.message,
+        })
+        .code(404)
+    }
+
+    return h
+      .response({
+        status: 'fail',
+        message: error.message,
+      })
+      .code(400)
+  }
+}
+
 module.exports = {
   createBookHandler,
   getBooksHandler,
   getBookHandler,
   updateBookHandler,
+  deleteBookHandler,
 }

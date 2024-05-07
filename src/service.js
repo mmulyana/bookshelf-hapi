@@ -18,6 +18,10 @@ const bookServices = {
     }
     books[index] = newData
   },
+  deleteById: function (id) {
+    const index = books.findIndex((book) => book.id == id)
+    books.splice(index, 1)
+  },
 }
 
 module.exports = bookServices
