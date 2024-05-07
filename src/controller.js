@@ -38,7 +38,11 @@ function createBookHandler(req, h) {
 }
 
 function getBooksHandler(req, h) {
-  const books = bookServices.findMany()
+  const books = bookServices.findMany({
+    name: req.query.name,
+    reading: req.query.reading,
+    finished: req.query.finished,
+  })
 
   return h
     .response({
@@ -63,7 +67,7 @@ function getBookHandler(req, h) {
       .response({
         status: 'success',
         data: {
-          book,
+          book: book[0],
         },
       })
       .code(200)
@@ -107,7 +111,6 @@ function updateBookHandler(req, h) {
       })
       .code(200)
   } catch (error) {
-    console.log(error)
     if (error.message == 'Gagal memperbarui buku. Id tidak ditemukan') {
       return h
         .response({

@@ -1,38 +1,6 @@
 const books = require('./data')
-
-const REQUIRED_FIELDS = [
-  'name',
-  'year',
-  'author',
-  'summary',
-  'publisher',
-  'pageCount',
-  'readPage',
-]
 function createBookSchema(payload) {
-  if (!payload || typeof payload !== 'object') {
-    return {
-      ok: false,
-      message: 'Invalid request',
-    }
-  }
-
-  let isValid = true
-  REQUIRED_FIELDS.forEach((obj) => {
-    if (!payload.hasOwnProperty(obj) && typeof payload[obj] !== undefined) {
-      console.log(obj)
-      isValid = false
-    }
-  })
-
-  if (!isValid) {
-    return {
-      ok: false,
-      message: 'Invalid request',
-    }
-  }
-
-  if (payload.name == '') {
+  if (typeof payload.name == 'undefined' || payload.name == '') {
     return {
       ok: false,
       message: 'Gagal menambahkan buku. Mohon isi nama buku',
@@ -59,32 +27,10 @@ function checkBookByID(id) {
 }
 
 function updateBookSchema(payload) {
-  if (!payload || typeof payload !== 'object') {
+  if (typeof payload.name == 'undefined' || payload.name == '') {
     return {
       ok: false,
-      message: 'Invalid request',
-    }
-  }
-
-  let isValid = true
-  REQUIRED_FIELDS.forEach((obj) => {
-    if (!payload.hasOwnProperty(obj) && typeof payload[obj] !== undefined) {
-      console.log(obj)
-      isValid = false
-    }
-  })
-
-  if (!isValid) {
-    return {
-      ok: false,
-      message: 'Invalid request',
-    }
-  }
-
-  if (payload.name == '') {
-    return {
-      ok: false,
-      message: 'Gagal menambahkan buku. Mohon isi nama buku',
+      message: 'Gagal memperbarui buku. Mohon isi nama buku',
     }
   }
 
@@ -92,7 +38,7 @@ function updateBookSchema(payload) {
     return {
       ok: false,
       message:
-        'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
+        'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
     }
   }
 
