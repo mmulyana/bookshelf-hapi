@@ -58,18 +58,48 @@ function checkBookByID(id) {
   return isBookExist !== -1
 }
 
-function createResponse(type = 'success', message, data) {
-  if (type == 'fail') {
+function updateBookSchema(payload) {
+  if (!payload || typeof payload !== 'object') {
     return {
-      status: 'fail',
-      message,
+      ok: false,
+      message: 'Invalid request',
     }
   }
+
+  let isValid = true
+  REQUIRED_FIELDS.forEach((obj) => {
+    if (!payload.hasOwnProperty(obj) && typeof payload[obj] !== undefined) {
+      console.log(obj)
+      isValid = false
+    }
+  })
+
+  if (!isValid) {
+    return {
+      ok: false,
+      message: 'Invalid request',
+    }
+  }
+
+  if (payload.name == '') {
+    return {
+      ok: false,
+      message: 'Gagal menambahkan buku. Mohon isi nama buku',
+    }
+  }
+
+  if (payload.readPage > payload.pageCount) {
+    return {
+      ok: false,
+      message:
+        'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
+    }
+  }
+
   return {
-    status: 'success',
-    message,
-    data,
+    ok: true,
+    data: payload,
   }
 }
 
-module.exports = { createBookSchema, checkBookByID, createResponse }
+module.exports = { createBookSchema, updateBookSchema, checkBookByID }

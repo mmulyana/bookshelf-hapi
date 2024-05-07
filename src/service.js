@@ -10,6 +10,14 @@ const bookServices = {
   findById: function (id) {
     return books.filter((book) => book.id === id)
   },
+  updateById: function (id, payload) {
+    const index = books.findIndex((book) => book.id == id)
+    const newData = {
+      ...books[index],
+      ...payload,
+    }
+    books[index] = newData
+  },
 }
 
 module.exports = bookServices

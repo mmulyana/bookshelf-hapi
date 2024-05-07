@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid')
-const { createBookSchema, checkBookByID } = require('./utils')
+const { createBookSchema, checkBookByID, updateBookSchema } = require('./utils')
 const bookServices = require('./service')
 
 function createBookHandler(req, h) {
@@ -12,44 +12,42 @@ function createBookHandler(req, h) {
     const payload = validated.data
     payload.id = nanoid(16)
     payload.reading ??= false
-    payload.finished = payload.readCount === payload.readPage
+    payload.finished = payload.pageCount === payload.readPage
     payload.insertedAt = new Date().toISOString()
     payload.updatedAt = new Date().toISOString()
 
     bookServices.create(payload)
 
-    const response = h.response({
-      status: 'success',
-      message: 'Buku berhasil ditambahkan',
-      data: {
-        bookId: payload.id,
-      },
-    })
-    response.code(201)
-    return response
+    return h
+      .response({
+        status: 'success',
+        message: 'Buku berhasil ditambahkan',
+        data: {
+          bookId: payload.id,
+        },
+      })
+      .code(201)
   } catch (error) {
-    const response = h.response({
-      status: 'fail',
-      message: error.message,
-    })
-    response.code(400)
-    return response
+    return h
+      .response({
+        status: 'fail',
+        message: error.message,
+      })
+      .code(400)
   }
 }
 
 function getBooksHandler(req, h) {
   const books = bookServices.findMany()
 
-  const response = h.response({
-    status: 'success',
-    data: {
-      books,
-    },
-  })
-
-  response.code(200)
-
-  return response
+  return h
+    .response({
+      status: 'success',
+      data: {
+        books,
+      },
+    })
+    .code(200)
 }
 
 function getBookHandler(req, h) {
@@ -61,15 +59,14 @@ function getBookHandler(req, h) {
 
     const book = bookServices.findById(bookId)
 
-    const response = h.response({
-      status: 'success',
-      data: {
-        book,
-      },
-    })
-    response.code(200)
-
-    return response
+    return h
+      .response({
+        status: 'success',
+        data: {
+          book,
+        },
+      })
+      .code(200)
   } catch (error) {
     const response = h.response({
       status: 'fail',
@@ -84,4 +81,54 @@ function getBookHandler(req, h) {
     return response
   }
 }
-module.exports = { createBookHandler, getBooksHandler, getBookHandler }
+
+function updateBookHandler(req, h) {
+  const { bookId } = req.params
+  try {
+    if (!checkBookByID(bookId)) {
+      throw new Error('Gagal memperbarui buku. Id tidak ditemukan')
+    }
+
+    const validated = updateBookSchema(req.payload)
+    if (!validated.ok) {
+      throw new Error(validated.message)
+    }
+
+    const payload = validated.data
+    payload.finished = payload.readPage == payload.pageCount
+    payload.updatedAt = new Date().toISOString()
+
+    bookServices.updateById(bookId, payload)
+
+    return h
+      .response({
+        status: 'success',
+        message: 'Buku berhasil diperbarui',
+      })
+      .code(200)
+  } catch (error) {
+    console.log(error)
+    if (error.message == 'Gagal memperbarui buku. Id tidak ditemukan') {
+      return h
+        .response({
+          status: 'fail',
+          message: error.message,
+        })
+        .code(404)
+    }
+
+    return h
+      .response({
+        status: 'fail',
+        message: error.message,
+      })
+      .code(400)
+  }
+}
+
+module.exports = {
+  createBookHandler,
+  getBooksHandler,
+  getBookHandler,
+  updateBookHandler,
+}
