@@ -1,3 +1,5 @@
+const books = require('./data')
+
 const REQUIRED_FIELDS = [
   'name',
   'year',
@@ -51,4 +53,23 @@ function createBookSchema(payload) {
   }
 }
 
-module.exports = { createBookSchema }
+function checkBookByID(id) {
+  const isBookExist = books.findIndex((book) => book.id === id)
+  return isBookExist !== -1
+}
+
+function createResponse(type = 'success', message, data) {
+  if (type == 'fail') {
+    return {
+      status: 'fail',
+      message,
+    }
+  }
+  return {
+    status: 'success',
+    message,
+    data,
+  }
+}
+
+module.exports = { createBookSchema, checkBookByID, createResponse }

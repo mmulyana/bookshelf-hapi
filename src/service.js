@@ -7,6 +7,9 @@ const bookServices = {
   findMany: function () {
     return books
   },
+  findById: function (id) {
+    return books.filter((book) => book.id === id)
+  },
 }
 
 module.exports = bookServices
